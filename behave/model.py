@@ -17,11 +17,12 @@ import logging
 import itertools
 import time
 import six
-from six.moves import zip       # pylint: disable=redefined-builtin
+from six.moves import zip  # pylint: disable=redefined-builtin
 from behave.model_core import \
-        Status, BasicStatement, TagAndStatusStatement, TagStatement, Replayable
+    Status, BasicStatement, TagAndStatusStatement, TagStatement, Replayable
 from behave.matchers import NoMatch
 from behave.textutil import text as _text
+
 if six.PY2:
     # -- USE PYTHON3 BACKPORT: With unicode traceback support.
     import traceback2 as traceback
@@ -165,7 +166,7 @@ class Feature(TagAndStatusStatement, Replayable):
 
     def __repr__(self):
         return '<Feature "%s": %d scenario(s)>' % \
-            (self.name, len(self.scenarios))
+               (self.name, len(self.scenarios))
 
     def __iter__(self):
         return iter(self.scenarios)
@@ -302,7 +303,7 @@ class Feature(TagAndStatusStatement, Replayable):
         if not self.scenarios:
             # -- SPECIAL CASE: Feature without scenarios
             self.set_status(Status.skipped)
-        assert self.status in self.final_status #< skipped, failed or passed.
+        assert self.status in self.final_status  # < skipped, failed or passed.
 
     def run(self, runner):
         # pylint: disable=too-many-branches
@@ -310,7 +311,7 @@ class Feature(TagAndStatusStatement, Replayable):
         self.clear_status()
         self.hook_failed = False
 
-        runner.context._push(layer_name="feature")      # pylint: disable=protected-access
+        runner.context._push(layer_name="feature")  # pylint: disable=protected-access
         runner.context.feature = self
         runner.context.tags = set(self.tags)
 
@@ -343,7 +344,7 @@ class Feature(TagAndStatusStatement, Replayable):
             for scenario in self.scenarios:
                 # -- OPTIONAL: Select scenario by name (regular expressions).
                 if (runner.config.name and
-                        not scenario.should_run_with_name_select(runner.config)):
+                    not scenario.should_run_with_name_select(runner.config)):
                     scenario.mark_skipped()
                     continue
 
@@ -369,7 +370,7 @@ class Feature(TagAndStatusStatement, Replayable):
 
         # -- PERFORM CONTEXT CLEANUP: May raise cleanup errors.
         try:
-            runner.context._pop()       # pylint: disable=protected-access
+            runner.context._pop()  # pylint: disable=protected-access
         except Exception:
             # -- CLEANUP-ERROR:
             self.set_status(Status.failed)
@@ -695,7 +696,7 @@ class Scenario(TagAndStatusStatement, Replayable):
         """
         self.skip(require_not_executed=True)
         assert self.status == Status.skipped or self.hook_failed, \
-               "OOPS: scenario.status=%s" % self.status.name
+            "OOPS: scenario.status=%s" % self.status.name
 
     def skip(self, reason=None, require_not_executed=False):
         """Skip from executing this scenario or the remaining parts of it.
@@ -723,7 +724,7 @@ class Scenario(TagAndStatusStatement, Replayable):
         scenario_without_steps = not self.steps and not self.background_steps
         if scenario_without_steps:
             self.set_status(Status.skipped)
-        assert self.status in self.final_status #< skipped, failed or passed
+        assert self.status in self.final_status  # < skipped, failed or passed
 
     def run(self, runner):
         # pylint: disable=too-many-branches, too-many-statements
@@ -737,7 +738,7 @@ class Scenario(TagAndStatusStatement, Replayable):
         dry_run_scenario = run_scenario and runner.config.dry_run
         self.was_dry_run = dry_run_scenario
 
-        runner.context._push(layer_name="scenario")      # pylint: disable=protected-access
+        runner.context._push(layer_name="scenario")  # pylint: disable=protected-access
         runner.context.scenario = self
         runner.context.tags = set(self.effective_tags)
 
@@ -773,12 +774,16 @@ class Scenario(TagAndStatusStatement, Replayable):
             for step in self.all_steps:
                 if run_steps:
                     if not step.run(runner):
+                        #FIXME this is not where this should happen, no idea where scenario gets traceback from step..
+                        self.exc_traceback = step.exc_traceback
+                        # self.error_message = step.error_message
                         # -- CASE: Failed or undefined step
                         #    Optionally continue_after_failed_step if enabled.
                         #    But disable run_steps after undefined-step.
                         run_steps = (self.continue_after_failed_step and
                                      step.status == Status.failed)
                         failed = True
+
                         # pylint: disable=protected-access
                         runner.context._set_root_attribute("failed", True)
                         self.set_status(Status.failed)
@@ -790,6 +795,7 @@ class Scenario(TagAndStatusStatement, Replayable):
                     # -- SKIP STEPS: After failure/undefined-step occurred.
                     # BUT: Detect all remaining undefined steps.
                     step.status = Status.skipped
+
                     if dry_run_scenario:
                         # pylint: disable=redefined-variable-type
                         step.status = Status.untested
@@ -813,10 +819,10 @@ class Scenario(TagAndStatusStatement, Replayable):
                     step.status = Status.skipped
 
         self.clear_status()  # -- ENFORCE: compute_status() after run.
+
         if not run_scenario and not self.steps:
             # -- SPECIAL CASE: Scenario without steps.
             self.set_status(Status.skipped)
-
 
         if hooks_called:
             runner.run_hook("after_scenario", runner.context, self)
@@ -828,7 +834,7 @@ class Scenario(TagAndStatusStatement, Replayable):
 
         # -- PERFORM CONTEXT-CLEANUP: May raise cleanup errors.
         try:
-            runner.context._pop()       # pylint: disable=protected-access
+            runner.context._pop()  # pylint: disable=protected-access
         except Exception:
             self.set_status(Status.failed)
             failed = True
@@ -839,6 +845,9 @@ class Scenario(TagAndStatusStatement, Replayable):
             self.captured = runner.capture_controller.captured
 
         runner.teardown_capture()
+        self.name
+        self.status
+
         return failed
 
 
@@ -870,7 +879,7 @@ class ScenarioOutlineBuilder(object):
                 continue
             for name, value in placeholders.items():
                 if safe_values and ("<" in value and ">" in value):
-                    continue    # -- OOPS, value looks like placeholder.
+                    continue  # -- OOPS, value looks like placeholder.
                 placeholder = u"<%s>" % name
                 text = text.replace(placeholder, value)
         return text
@@ -903,7 +912,7 @@ class ScenarioOutlineBuilder(object):
             def __init__(self, name, index):
                 self.name = name
                 self.index = index
-                self.id = name      # pylint: disable=invalid-name
+                self.id = name  # pylint: disable=invalid-name
 
         example_data = Data(examples_name, example.index)
         row_data = Data(row.id, row.index)
@@ -954,11 +963,11 @@ class ScenarioOutlineBuilder(object):
         }
         scenarios = []
         for example_index, example in enumerate(scenario_outline.examples):
-            example.index = example_index+1
+            example.index = example_index + 1
             params["examples.name"] = example.name
             params["examples.index"] = _text(example.index)
             for row_index, row in enumerate(example.table):
-                row.index = row_index+1
+                row.index = row_index + 1
                 row.id = "%d.%d" % (example.index, row.index)
                 params["row.id"] = row.id
                 params["row.index"] = _text(row.index)
@@ -979,7 +988,7 @@ class ScenarioOutlineBuilder(object):
                                     scenario_name, row_tags, new_steps)
                 scenario.feature = scenario_outline.feature
                 scenario.background = scenario_outline.background
-                scenario._row = row     # pylint: disable=protected-access
+                scenario._row = row  # pylint: disable=protected-access
                 scenarios.append(scenario)
         return scenarios
 
@@ -1072,7 +1081,7 @@ class ScenarioOutline(Scenario):
     def reset(self):
         """Reset runtime temporary data like before a test run."""
         super(ScenarioOutline, self).reset()
-        for scenario in self._scenarios:    # -- AVOID: BUILD-SCENARIOS
+        for scenario in self._scenarios:  # -- AVOID: BUILD-SCENARIOS
             scenario.reset()
 
     def send_status(self):
@@ -1107,7 +1116,7 @@ class ScenarioOutline(Scenario):
         return '<ScenarioOutline "%s">' % self.name
 
     def __iter__(self):
-        return iter(self.scenarios) # -- REQUIRE: BUILD-SCENARIOS
+        return iter(self.scenarios)  # -- REQUIRE: BUILD-SCENARIOS
 
     @property
     def is_finished(self):
@@ -1120,7 +1129,7 @@ class ScenarioOutline(Scenario):
 
     def compute_status(self):
         skipped_count = 0
-        for scenario in self._scenarios:    # -- AVOID: BUILD-SCENARIOS
+        for scenario in self._scenarios:  # -- AVOID: BUILD-SCENARIOS
             scenario_status = scenario.status
             if scenario_status in (Status.failed, Status.untested):
                 return scenario_status
@@ -1135,7 +1144,7 @@ class ScenarioOutline(Scenario):
     @property
     def duration(self):
         outline_duration = 0
-        for scenario in self._scenarios:    # -- AVOID: BUILD-SCENARIOS
+        for scenario in self._scenarios:  # -- AVOID: BUILD-SCENARIOS
             outline_duration += scenario.duration
         return outline_duration
 
@@ -1149,7 +1158,7 @@ class ScenarioOutline(Scenario):
         if tag_expression.check(self.effective_tags):
             return True
 
-        for scenario in self.scenarios:     # -- REQUIRE: BUILD-SCENARIOS
+        for scenario in self.scenarios:  # -- REQUIRE: BUILD-SCENARIOS
             if scenario.should_run_with_tags(tag_expression):
                 return True
         # -- NOTHING SELECTED:
@@ -1162,14 +1171,13 @@ class ScenarioOutline(Scenario):
         :return: True, if scenario should run. False, otherwise (skip it).
         """
         if not config.name:
-            return True # -- SELECT-ALL: Select by name is not specified.
+            return True  # -- SELECT-ALL: Select by name is not specified.
 
-        for scenario in self.scenarios:     # -- REQUIRE: BUILD-SCENARIOS
+        for scenario in self.scenarios:  # -- REQUIRE: BUILD-SCENARIOS
             if scenario.should_run_with_name_select(config):
                 return True
         # -- NOTHING SELECTED:
         return False
-
 
     def mark_skipped(self):
         """Marks this scenario outline (and all its scenarios/steps) as skipped.
@@ -1197,14 +1205,14 @@ class ScenarioOutline(Scenario):
         if not self.scenarios:
             # -- SPECIAL CASE: ScenarioOutline without scenarios/examples
             self.set_status(Status.skipped)
-        assert self.status in self.final_status #< skipped, failed or passed
+        assert self.status in self.final_status  # < skipped, failed or passed
 
     def run(self, runner):
         # pylint: disable=protected-access
         # REASON: context._set_root_attribute(), scenario._row
         self.clear_status()
         failed_count = 0
-        for scenario in self.scenarios:     # -- REQUIRE: BUILD-SCENARIOS
+        for scenario in self.scenarios:  # -- REQUIRE: BUILD-SCENARIOS
             runner.context._set_root_attribute("active_outline", scenario._row)
             failed = scenario.run(runner)
             if failed:
@@ -1456,14 +1464,14 @@ class Step(BasicStatement, Replayable):
                 self.store_exception_context(e)
                 if e.args:
                     message = _text(e)
-                    error = u"Assertion Failed: "+ message
+                    error = u"Assertion Failed: " + message
                 else:
                     # no assertion text; format the exception
                     error = _text(traceback.format_exc())
-            except Exception as e:      # pylint: disable=broad-except
+            except Exception as e:  # pylint: disable=broad-except
                 self.status = Status.failed
                 error = _text(traceback.format_exc())
-                self.store_exception_context(e)
+                self.store_exception_context(e, traceback)
 
         self.duration = time.time() - start
         runner.run_hook("after_step", runner.context, self)
@@ -1474,7 +1482,7 @@ class Step(BasicStatement, Replayable):
             runner.stop_capture()
 
         # flesh out the failure with details
-        store_captured_always = False   # PREPARED
+        store_captured_always = False  # PREPARED
         store_captured = self.status == Status.failed or store_captured_always
         if self.status == Status.failed:
             assert isinstance(error, six.text_type)
@@ -1697,6 +1705,7 @@ class Row(object):
 
     .. _`table`: gherkin.html#table
     """
+
     def __init__(self, headings, cells, line=None, comments=None):
         self.headings = headings
         self.comments = comments
@@ -1756,7 +1765,7 @@ class Tag(six.text_type):
 
     See :ref:`controlling things with tags`.
     """
-    allowed_chars = u"._-=:,;()"    # In addition to aplha-numerical chars.
+    allowed_chars = u"._-=:,;()"  # In addition to aplha-numerical chars.
     quoting_chars = ("'", '"', "<", ">")
 
     def __new__(cls, name, line):
@@ -1806,7 +1815,7 @@ class Tag(six.text_type):
             elif char.isspace():
                 chars.append(u"_")
             elif char in cls.quoting_chars:
-                pass    # -- NORMALIZE: Remove any quoting chars.
+                pass  # -- NORMALIZE: Remove any quoting chars.
             # -- MAYBE:
             # else:
             #     # -- OTHERWISE: Accept gracefully any other character.
@@ -1827,6 +1836,7 @@ class Text(six.text_type):
 
        Currently only "text/plain".
     """
+
     def __new__(cls, value, content_type=u"text/plain", line=0):
         assert isinstance(value, six.text_type)
         assert isinstance(content_type, six.text_type)

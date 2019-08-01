@@ -396,7 +396,9 @@ class JUnitReporter(Reporter):
                 element_name = "error"
             # -- COMMON-PART:
             failure = ElementTree.Element(element_name)
+            # print("HERE1")
             if step:
+                # print("HERE3")
                 step_text = self.describe_step(step).rstrip()
                 text = u"\nFailing step: %s\nLocation: %s\n" % \
                        (step_text, step.location)
@@ -411,8 +413,12 @@ class JUnitReporter(Reporter):
                     failure_type = scenario.exception.__class__.__name__
                 failure.set(u'type', failure_type)
                 failure.set(u'message', scenario.error_message or "")
-                traceback_lines = [u"Traceback:\n"] + scenario.exc_traceback
-                text = _text(u"".join(traceback_lines))
+
+                if scenario.exc_traceback is not None:
+                    traceback_lines = [u"Traceback:\n"] + scenario.exc_traceback
+                    text = _text(u"".join(traceback_lines))
+                else:
+                    text = "Traceback not captured"
             failure.append(CDATA(text))
             case.append(failure)
         elif (scenario.status in (Status.skipped, Status.untested)

@@ -11,6 +11,7 @@ import six
 from behave.capture import Captured
 from behave.textutil import text as _text
 from enum import Enum
+
 if six.PY2:
     # -- USE: Python3 backport for better unicode compatibility.
     import traceback2 as traceback
@@ -18,6 +19,8 @@ else:
     import traceback
 
 PLATFORM_WIN = sys.platform.startswith("win")
+
+
 def posixpath_normalize(path):
     return path.replace("\\", "/")
 
@@ -120,6 +123,7 @@ class Argument(object):
 
        The end index in the step name of the argument. Used for display.
     """
+
     def __init__(self, start, end, original, value, name=None):
         self.start = start
         self.end = end
@@ -142,7 +146,7 @@ class FileLocation(object):
       * "{filename}:{line}" or
       * "{filename}" (if line number is not present)
     """
-    __pychecker__ = "missingattrs=line"     # -- Ignore warnings for 'line'.
+    __pychecker__ = "missingattrs=line"  # -- Ignore warnings for 'line'.
 
     def __init__(self, filename, line=None):
         if PLATFORM_WIN:
@@ -274,7 +278,7 @@ class FileLocation(object):
 class BasicStatement(object):
     def __init__(self, filename, line, keyword, name):
         filename = filename or '<string>'
-        filename = os.path.relpath(filename, os.getcwd())   # -- NEEDS: abspath?
+        filename = os.path.relpath(filename, os.getcwd())  # -- NEEDS: abspath?
         self.location = FileLocation(filename, line)
         assert isinstance(keyword, six.text_type)
         assert isinstance(name, six.text_type)
@@ -323,9 +327,18 @@ class BasicStatement(object):
         if 'captured' in value:
             self.captured.recv_status(value['captured'])
 
-    def store_exception_context(self, exception):
+    def store_exception_context(self, exception, myTraceback=None):
         self.exception = exception
-        self.exc_traceback = traceback.format_tb(sys.exc_info()[2])
+
+        result = None
+        try:
+            result = traceback.format_tb(sys.exc_info()[2])
+        except:
+            # print(f"my fix: {myTraceback.format_exc()}")
+            result = myTraceback.format_exc()
+
+        # print(f"result = {result}")
+        self.exc_traceback = result
 
     def __hash__(self):
         # -- NEEDED-FOR: PYTHON3
@@ -358,7 +371,7 @@ class BasicStatement(object):
     def __ge__(self, other):
         # -- SEE ALSO: python2.7, functools.total_ordering
         # OR: return self >= other
-        return not self < other     # pylint: disable=unneeded-not
+        return not self < other  # pylint: disable=unneeded-not
 
     # def __cmp__(self, other):
     #     # -- NOTE: Ignore potential FileLocation differences.
