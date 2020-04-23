@@ -1406,6 +1406,11 @@ class Step(BasicStatement, Replayable):
         outline_step = self
         return ScenarioOutlineBuilder.make_step_for_row(outline_step, table_row)
 
+    def skip(self, reason=None):
+        self.clear_status()
+        self.should_skip = True
+        self.skip_reason = reason
+
     def run(self, runner, quiet=False, capture=True):
         # pylint: disable=too-many-branches, too-many-statements
         # -- RESET: Run-time information.
@@ -1442,7 +1447,7 @@ class Step(BasicStatement, Replayable):
             skip_step_untested = True
 
         start = time.time()
-        if not skip_step_untested:
+        if not skip_step_untested or not self.should_skip:
             try:
                 # -- ENSURE:
                 #  * runner.context.text/.table attributes are reset (#66).
