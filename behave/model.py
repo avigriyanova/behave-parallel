@@ -1354,6 +1354,8 @@ class Step(BasicStatement, Replayable):
         self.hook_failed = False
         self.duration = 0
 
+        self.should_skip = False
+
     def __hash__(self):
         return hash((self.filename, self.line, self.step_type, self.name))
 
