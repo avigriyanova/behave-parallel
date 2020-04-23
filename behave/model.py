@@ -1446,7 +1446,7 @@ class Step(BasicStatement, Replayable):
             skip_step_untested = True
 
         start = time.time()
-        if not skip_step_untested or not self.should_skip:
+        if not skip_step_untested and not self.should_skip:
             try:
                 # -- ENSURE:
                 #  * runner.context.text/.table attributes are reset (#66).
@@ -1481,6 +1481,9 @@ class Step(BasicStatement, Replayable):
         runner.run_hook("after_step", runner.context, self)
         if self.hook_failed:
             self.status = Status.failed
+
+        if self.should_skip:
+            self.status = Status.skipped
 
         if capture:
             runner.stop_capture()
