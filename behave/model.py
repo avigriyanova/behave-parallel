@@ -1407,7 +1407,6 @@ class Step(BasicStatement, Replayable):
         return ScenarioOutlineBuilder.make_step_for_row(outline_step, table_row)
 
     def skip(self, reason=None):
-        self.clear_status()
         self.should_skip = True
         self.skip_reason = reason
 
