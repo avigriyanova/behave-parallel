@@ -1554,6 +1554,15 @@ class Table(Replayable):
             for row in rows:
                 self.add_row(row, line)
 
+    def get_table_dict(self):
+        """
+        Returns a dictionary in a format:
+            { "heading1": (column1), "heading2": (column2), ...}
+        where column is a tuple of all the column values.
+        :return: a dict of tuples
+        """
+        return dict(zip(self.headings, list(zip(*self.rows))))
+
     def add_row(self, row, line=None):
         self.rows.append(Row(self.headings, row, line))
 
