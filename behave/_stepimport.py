@@ -50,7 +50,7 @@ class StepRegistryModule(FakeModule):
     """
     __all__ = [
         "given", "when", "then", "step",
-        "Given", "When", "Then", "Step",
+        "Given", "When", "Then", "Step", "MODE", "MODE ON", "MODE OFF"
     ]
 
     def __init__(self, step_registry):

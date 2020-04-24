@@ -16,7 +16,7 @@ from behave.textutil import text as _text
 # __all__ = names.split()
 __all__ = [
     "given", "when", "then", "step",    # PREFERRED.
-    "Given", "When", "Then", "Step"     # Also possible.
+    "Given", "When", "Then", "Step", "MODE", "MODE ON", "MODE OFF"     # Also possible.
 ]
 
 
@@ -102,7 +102,7 @@ registry = StepRegistry()
 def setup_step_decorators(run_context=None, registry=registry):
     if run_context is None:
         run_context = globals()
-    for step_type in ("given", "when", "then", "step"):
+    for step_type in ("given", "when", "then", "step", "MODE", "MODE ON", "MODE OFF"):
         step_decorator = registry.make_decorator(step_type)
         run_context[step_type.title()] = run_context[step_type] = step_decorator
 
