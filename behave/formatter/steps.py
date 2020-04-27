@@ -26,7 +26,7 @@ class AbstractStepsFormatter(Formatter):
     .. note::
         Supports behave dry-run mode.
     """
-    step_types = ("given", "when", "then", "step", "MODE", "MODE ON", "MODE OFF")
+    step_types = ("given", "when", "then", "step")
 
     def __init__(self, stream_opener, config):
         super(AbstractStepsFormatter, self).__init__(stream_opener, config)

@@ -263,7 +263,7 @@ The following step definitions are provided here.
     @staticmethod
     def make_step_definition_index_id(step):
         if step.step_type == "step":
-            index_kinds = ("Given", "When", "Then", "Step", "MODE", "MODE ON", "MODE OFF")
+            index_kinds = ("Given", "When", "Then", "Step")
         else:
             keyword = step.step_type.capitalize()
             index_kinds = (keyword,)
