@@ -24,7 +24,7 @@ from behave.fixture import fixture, use_fixture
 # pylint: disable=undefined-all-variable
 __all__ = [
     "given", "when", "then", "step", "use_step_matcher", "register_type",
-    "Given", "When", "Then", "Step", "MODE", "MODE"
+    "Given", "When", "Then", "Step",
     "fixture", "use_fixture",
     # -- DEPRECATING:
     "step_matcher"

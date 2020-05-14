@@ -31,7 +31,6 @@ class StepRegistry(object):
             "when": [],
             "then": [],
             "step": [],
-            "MODE": []
         }
 
     @staticmethod
