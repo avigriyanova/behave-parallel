@@ -1354,6 +1354,8 @@ class Step(BasicStatement, Replayable):
         self.hook_failed = False
         self.duration = 0
 
+        self.should_skip = False
+
     def __hash__(self):
         return hash((self.filename, self.line, self.step_type, self.name))
 
@@ -1406,6 +1408,10 @@ class Step(BasicStatement, Replayable):
         outline_step = self
         return ScenarioOutlineBuilder.make_step_for_row(outline_step, table_row)
 
+    def skip(self, reason=None):
+        self.should_skip = True
+        self.skip_reason = reason
+
     def run(self, runner, quiet=False, capture=True):
         # pylint: disable=too-many-branches, too-many-statements
         # -- RESET: Run-time information.
@@ -1442,7 +1448,7 @@ class Step(BasicStatement, Replayable):
             skip_step_untested = True
 
         start = time.time()
-        if not skip_step_untested:
+        if not skip_step_untested and not self.should_skip:
             try:
                 # -- ENSURE:
                 #  * runner.context.text/.table attributes are reset (#66).
@@ -1477,6 +1483,9 @@ class Step(BasicStatement, Replayable):
         runner.run_hook("after_step", runner.context, self)
         if self.hook_failed:
             self.status = Status.failed
+
+        if self.should_skip:
+            self.status = Status.skipped
 
         if capture:
             runner.stop_capture()
@@ -1544,6 +1553,15 @@ class Table(Replayable):
         if rows:
             for row in rows:
                 self.add_row(row, line)
+
+    def get_table_dict(self):
+        """
+        Returns a dictionary in a format:
+            { "heading1": (column1), "heading2": (column2), ...}
+        where column is a tuple of all the column values.
+        :return: a dict of tuples
+        """
+        return dict(zip(self.headings, list(zip(*self.rows))))
 
     def add_row(self, row, line=None):
         self.rows.append(Row(self.headings, row, line))
