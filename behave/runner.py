@@ -568,10 +568,8 @@ class ModelRunner(object):
             #         raise
             except Exception as e:  # pylint: disable=broad-except
                 # -- HANDLE HOOK ERRORS:
-                use_traceback = False
-                if self.config.verbose:
-                    use_traceback = True
-                    ExceptionUtil.set_traceback(e)
+                use_traceback = True
+                ExceptionUtil.set_traceback(e)
                 extra = u""
                 if "tag" in name:
                     extra = "(tag=%s)" % args[0]
