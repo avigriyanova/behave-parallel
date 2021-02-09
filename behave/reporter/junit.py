@@ -445,7 +445,7 @@ class JUnitReporter(Reporter):
         # Append the captured standard output
         if scenario.captured.stdout:
             output = _text(scenario.captured.stdout)
-            text += u"\nCaptured stdout capture.py:\n%s\n" % output
+            text += u"\nCaptured stdout junit:\n%s\n" % output
         stdout.append(CDATA(text))
         case.append(stdout)
 
