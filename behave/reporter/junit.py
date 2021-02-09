@@ -446,6 +446,8 @@ class JUnitReporter(Reporter):
         if scenario.captured.stdout:
             output = _text(scenario.captured.stdout)
             text += u"\nCaptured stdout:\n%s\n" % output
+            output2 = _text(scenario.captured.log_output)
+            text += u"\nCaptured logging:\n%s\n" % output2
         stdout.append(CDATA(text))
         case.append(stdout)
 
