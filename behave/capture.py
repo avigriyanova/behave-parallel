@@ -74,13 +74,13 @@ class Captured(object):
         """
         report_parts = []
         if self.stdout:
-            parts = ["Captured stdout capture.py:", _text(self.stdout).rstrip(), ""]
+            parts = ["Captured stdout:", _text(self.stdout).rstrip(), ""]
             report_parts.extend(parts)
         if self.stderr:
-            parts = ["Captured stderr capture.py:", _text(self.stderr).rstrip(), ""]
+            parts = ["Captured stderr:", _text(self.stderr).rstrip(), ""]
             report_parts.extend(parts)
         if self.log_output:
-            parts = ["Captured logging capture.py:", _text(self.log_output)]
+            parts = ["Captured logging:", _text(self.log_output)]
             report_parts.extend(parts)
         return self.linesep.join(report_parts).strip()
 
