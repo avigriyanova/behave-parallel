@@ -1505,6 +1505,7 @@ class Step(BasicStatement, Replayable):
             keep_going = False
         elif store_captured and capture:
             self.captured = runner.capture_controller.captured
+            print('CAPTURED123 ' + str(self.captured))
 
         if not quiet:
             for formatter in runner.formatters:
